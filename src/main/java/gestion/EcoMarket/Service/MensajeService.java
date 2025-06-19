@@ -1,5 +1,6 @@
 package gestion.EcoMarket.Service;
 
+import java.lang.StackWalker.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,7 +40,7 @@ public class MensajeService {
         }
     }
 
-    public boolean update(Long id, Mensaje mensaje){
+    public Optional<Mensaje> update(Long id, Mensaje mensaje){
         Optional<Mensaje> mensajeExiste = mensajeRepository.findById(id);
         if (mensajeExiste.isPresent()) {
             Mensaje m = mensajeExiste.get();
@@ -48,9 +49,9 @@ public class MensajeService {
             m.setDescripcion(mensaje.getDescripcion());
             m.setTitulo(mensaje.getTitulo());
             mensajeRepository.save(m);
-            return true;
+            return Optional.of(m);
         } else{
-            return false;
+            return Optional.empty();
         }
     }
 }

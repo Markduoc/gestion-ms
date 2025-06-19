@@ -16,10 +16,9 @@ import gestion.EcoMarket.Service.MensajeService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PutMapping;
 
 
-
+//CONTROLADOR SIN UTILIZAR
 @RestController
 @RequestMapping("/api/v1/mensajes")
 @Tag(name = "Mensaje", description = "Gestion de reclamos")
@@ -54,15 +53,6 @@ public class MensajeController {
 
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<String> actualizar(@PathVariable Long id, @RequestBody Mensaje mensaje){
-        boolean actualizado = mensajeService.update(id, mensaje);
-        if (actualizado) {
-            return ResponseEntity.ok().body("El usuario ha sido actualizado");
-        } else{
-            return ResponseEntity.status(404).body("No se ha encontrado el mensaje buscado");
-        }
-    }
 
     @GetMapping("/{id}")
     public ResponseEntity<Mensaje> buscarPorId(@PathVariable Long id){
