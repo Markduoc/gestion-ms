@@ -37,7 +37,7 @@ public class MensajeControllerV2 {
 
     @Autowired
     MensajeModelAssembler assembler;
-    
+
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<CollectionModel<EntityModel<Mensaje>>> Listar(){
         List<Mensaje> mensajes = mensajeService.findAll();
@@ -99,7 +99,12 @@ public class MensajeControllerV2 {
             return ResponseEntity.status(404).build();
         }
     }
-    
+    public void setMensajeService(MensajeService mensajeService) {
+        this.mensajeService = mensajeService;
+    }
 
+    public void setAssembler(MensajeModelAssembler assembler) {
+        this.assembler = assembler;
+    }
 }
 
