@@ -4,9 +4,11 @@ import gestion.EcoMarket.Model.Mensaje;
 import gestion.EcoMarket.Service.MensajeService;
 import gestion.EcoMarket.Assemblers.MensajeModelAssembler;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
@@ -15,29 +17,28 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-
+@ExtendWith(MockitoExtension.class)
 public class MensajeControllerTest {
     @Mock
     private MensajeService mensajeService;
+    @Mock
     private MensajeModelAssembler assembler;
+    @InjectMocks
     private MensajeControllerV2 controller;
 
-    @BeforeEach
-    void setUp() {
-        mensajeService = mock(MensajeService.class);
-        assembler = mock(MensajeModelAssembler.class);
-        controller = new MensajeControllerV2();
-        
-}
+
 
     @Test
     void testListarMensajes_conContenido() {
         Mensaje mensaje1 = new Mensaje();
         Mensaje mensaje2 = new Mensaje();
         when(mensajeService.findAll()).thenReturn(List.of(mensaje1, mensaje2));
+        when(assembler.toModel(any())).thenReturn(EntityModel.of(new Mensaje()));
         ResponseEntity<CollectionModel<EntityModel<Mensaje>>> response = controller.Listar();
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
