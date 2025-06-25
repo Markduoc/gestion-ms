@@ -33,4 +33,7 @@ public class Mensaje {
     @Column
     private boolean activo;
 
+    @Column(name = "id_usuario") 
+    private Long idUsuario;
+
 }

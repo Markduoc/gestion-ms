@@ -19,7 +19,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import gestion.EcoMarket.Assemblers.MensajeModelAssembler;
+import gestion.EcoMarket.Client.UsuarioClient;
+import gestion.EcoMarket.DTO.MensajeConUsuarioDTO;
+import gestion.EcoMarket.DTO.UsuarioDTO;
 import gestion.EcoMarket.Model.Mensaje;
+import gestion.EcoMarket.Repository.MensajeRepository;
 import gestion.EcoMarket.Service.MensajeService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,6 +36,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 @RequestMapping("/api/v2/mensajes")
 @Tag(name = "Mensaje", description = "Gestion de reclamos")
 public class MensajeControllerV2 {
+    
     @Autowired
     private MensajeService mensajeService;
 
@@ -106,5 +111,27 @@ public class MensajeControllerV2 {
     public void setAssembler(MensajeModelAssembler assembler) {
         this.assembler = assembler;
     }
+    @Autowired
+    private UsuarioClient usuarioClient;
+
+    @Autowired
+    private MensajeRepository mensajeRepository;
+
+    @GetMapping("/con-usuario/{id}")
+    public ResponseEntity<MensajeConUsuarioDTO> getMensajeConUsuario(@PathVariable Long id) {
+        Optional<Mensaje> mensajeOpt = mensajeRepository.findById(id);
+        if (mensajeOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+    Mensaje mensaje = mensajeOpt.get();
+    UsuarioDTO usuario = usuarioClient.getUsuarioById(mensaje.getIdUsuario());
+
+    MensajeConUsuarioDTO respuesta = new MensajeConUsuarioDTO();
+    respuesta.setMensaje(mensaje);
+    respuesta.setUsuario(usuario);
+
+    return ResponseEntity.ok(respuesta);
+}
 }
 
