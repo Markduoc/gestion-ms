@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import gestion.EcoMarket.DTO.UsuarioDTO;
 
-@FeignClient(name = "usuarios-ms", url = "http://34.196.63.137:8080/usuarios-ms")
+@FeignClient(name = "usuarios-ms", url = "http://34.196.63.137:8080/api/v2/usuarios")
 public interface UsuarioClient {
     @GetMapping("/v2/usuarios/{id}")
     UsuarioDTO getUsuarioById(@PathVariable Long id);

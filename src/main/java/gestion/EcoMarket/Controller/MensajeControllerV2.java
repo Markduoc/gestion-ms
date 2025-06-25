@@ -43,6 +43,12 @@ public class MensajeControllerV2 {
     @Autowired
     MensajeModelAssembler assembler;
 
+    @Autowired
+    private UsuarioClient usuarioClient;
+
+    @Autowired
+    private MensajeRepository mensajeRepository;
+
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<CollectionModel<EntityModel<Mensaje>>> Listar(){
         List<Mensaje> mensajes = mensajeService.findAll();
@@ -111,27 +117,47 @@ public class MensajeControllerV2 {
     public void setAssembler(MensajeModelAssembler assembler) {
         this.assembler = assembler;
     }
-    @Autowired
-    private UsuarioClient usuarioClient;
-
-    @Autowired
-    private MensajeRepository mensajeRepository;
-
     @GetMapping("/con-usuario/{id}")
     public ResponseEntity<MensajeConUsuarioDTO> getMensajeConUsuario(@PathVariable Long id) {
-        Optional<Mensaje> mensajeOpt = mensajeRepository.findById(id);
-        if (mensajeOpt.isEmpty()) {
-            return ResponseEntity.notFound().build();
+        try {
+            Optional<Mensaje> mensajeOpt = mensajeRepository.findById(id);
+            if (mensajeOpt.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            Mensaje mensaje = mensajeOpt.get();
+            
+            // Validar que el mensaje tenga un idUsuario
+            if (mensaje.getIdUsuario() == null) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            try {
+                UsuarioDTO usuario = usuarioClient.getUsuarioById(mensaje.getIdUsuario());
+                
+                MensajeConUsuarioDTO respuesta = new MensajeConUsuarioDTO();
+                respuesta.setMensaje(mensaje);
+                respuesta.setUsuario(usuario);
+
+                return ResponseEntity.ok(respuesta);
+                
+            } catch (Exception e) {
+                // Log del error
+                System.err.println("Error al obtener usuario: " + e.getMessage());
+                
+                // Retornar solo el mensaje si no se puede obtener el usuario
+                MensajeConUsuarioDTO respuesta = new MensajeConUsuarioDTO();
+                respuesta.setMensaje(mensaje);
+                respuesta.setUsuario(null); // o un usuario por defecto
+                
+                return ResponseEntity.ok(respuesta);
+            }
+            
+        } catch (Exception e) {
+            System.err.println("Error general: " + e.getMessage());
+            return ResponseEntity.internalServerError().build();
         }
-
-    Mensaje mensaje = mensajeOpt.get();
-    UsuarioDTO usuario = usuarioClient.getUsuarioById(mensaje.getIdUsuario());
-
-    MensajeConUsuarioDTO respuesta = new MensajeConUsuarioDTO();
-    respuesta.setMensaje(mensaje);
-    respuesta.setUsuario(usuario);
-
-    return ResponseEntity.ok(respuesta);
 }
 }
+
 
