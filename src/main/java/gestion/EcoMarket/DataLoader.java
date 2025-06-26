@@ -29,7 +29,6 @@ public class DataLoader implements CommandLineRunner {
             mensaje.setCuerpo(faker.lorem().paragraph(2));
             mensaje.setActivo(random.nextBoolean());
             
-            // ID de usuario aleatorio
             mensaje.setIdUsuario(Long.valueOf(random.nextInt(5) + 1));
 
             mensajeRepository.save(mensaje);
