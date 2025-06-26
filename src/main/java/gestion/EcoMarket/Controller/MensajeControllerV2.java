@@ -3,6 +3,7 @@ package gestion.EcoMarket.Controller;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -157,7 +158,43 @@ public class MensajeControllerV2 {
             System.err.println("Error general: " + e.getMessage());
             return ResponseEntity.internalServerError().build();
         }
+        
 }
+
+    @GetMapping("/con-usuario")
+    public ResponseEntity<List<MensajeConUsuarioDTO>> getAllMensajesConUsuario() {
+        try {
+            List<Mensaje> mensajes = mensajeRepository.findAll();
+            List<MensajeConUsuarioDTO> mensajesConUsuario = new ArrayList<>();
+            
+            for (Mensaje mensaje : mensajes) {
+                MensajeConUsuarioDTO dto = new MensajeConUsuarioDTO();
+                dto.setMensaje(mensaje);
+                
+                // Solo buscar usuario si idUsuario no es null
+                if (mensaje.getIdUsuario() != null) {
+                    try {
+                        UsuarioDTO usuario = usuarioClient.getUsuarioById(mensaje.getIdUsuario());
+                        dto.setUsuario(usuario);
+                    } catch (Exception e) {
+                        System.err.println("Error al obtener usuario " + mensaje.getIdUsuario() + 
+                                        " para mensaje " + mensaje.getId() + ": " + e.getMessage());
+                        dto.setUsuario(null); // Usuario null si hay error
+                    }
+                } else {
+                    dto.setUsuario(null); // Usuario null si no hay idUsuario
+                }
+                
+                mensajesConUsuario.add(dto);
+            }
+            
+            return ResponseEntity.ok(mensajesConUsuario);
+            
+        } catch (Exception e) {
+            System.err.println("Error general en getAllMensajesConUsuario: " + e.getMessage());
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 }
 
 
