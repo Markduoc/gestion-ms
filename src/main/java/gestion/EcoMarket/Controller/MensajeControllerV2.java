@@ -161,41 +161,6 @@ public class MensajeControllerV2 {
         
 }
 
-    @GetMapping("/con-usuario")
-    public ResponseEntity<List<MensajeConUsuarioDTO>> getAllMensajesConUsuario() {
-        try {
-            List<Mensaje> mensajes = mensajeRepository.findAll();
-            List<MensajeConUsuarioDTO> mensajesConUsuario = new ArrayList<>();
-            
-            for (Mensaje mensaje : mensajes) {
-                // FILTRO: Solo procesar mensajes que tengan idUsuario
-                if (mensaje.getIdUsuario() == null) {
-                    continue; // Saltar este mensaje y continuar con el siguiente
-                }
-                
-                MensajeConUsuarioDTO dto = new MensajeConUsuarioDTO();
-                dto.setMensaje(mensaje);
-                
-                try {
-                    UsuarioDTO usuario = usuarioClient.getUsuarioById(mensaje.getIdUsuario());
-                    dto.setUsuario(usuario);
-                    
-                    // Solo agregar a la lista si se pudo obtener el usuario exitosamente
-                    mensajesConUsuario.add(dto);
-                    
-                } catch (Exception e) {
-                    System.err.println("Error al obtener usuario " + mensaje.getIdUsuario() + 
-                                    " para mensaje " + mensaje.getId() + ": " + e.getMessage());
-                }
-            }
-            
-            return ResponseEntity.ok(mensajesConUsuario);
-            
-        } catch (Exception e) {
-            System.err.println("Error general en getAllMensajesConUsuario: " + e.getMessage());
-            return ResponseEntity.internalServerError().build();
-        }
-    }
 }
 
 
