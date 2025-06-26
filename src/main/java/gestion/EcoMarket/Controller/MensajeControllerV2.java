@@ -168,24 +168,25 @@ public class MensajeControllerV2 {
             List<MensajeConUsuarioDTO> mensajesConUsuario = new ArrayList<>();
             
             for (Mensaje mensaje : mensajes) {
+                // FILTRO: Solo procesar mensajes que tengan idUsuario
+                if (mensaje.getIdUsuario() == null) {
+                    continue; // Saltar este mensaje y continuar con el siguiente
+                }
+                
                 MensajeConUsuarioDTO dto = new MensajeConUsuarioDTO();
                 dto.setMensaje(mensaje);
                 
-                // Solo buscar usuario si idUsuario no es null
-                if (mensaje.getIdUsuario() != null) {
-                    try {
-                        UsuarioDTO usuario = usuarioClient.getUsuarioById(mensaje.getIdUsuario());
-                        dto.setUsuario(usuario);
-                    } catch (Exception e) {
-                        System.err.println("Error al obtener usuario " + mensaje.getIdUsuario() + 
-                                        " para mensaje " + mensaje.getId() + ": " + e.getMessage());
-                        dto.setUsuario(null); // Usuario null si hay error
-                    }
-                } else {
-                    dto.setUsuario(null); // Usuario null si no hay idUsuario
+                try {
+                    UsuarioDTO usuario = usuarioClient.getUsuarioById(mensaje.getIdUsuario());
+                    dto.setUsuario(usuario);
+                    
+                    // Solo agregar a la lista si se pudo obtener el usuario exitosamente
+                    mensajesConUsuario.add(dto);
+                    
+                } catch (Exception e) {
+                    System.err.println("Error al obtener usuario " + mensaje.getIdUsuario() + 
+                                    " para mensaje " + mensaje.getId() + ": " + e.getMessage());
                 }
-                
-                mensajesConUsuario.add(dto);
             }
             
             return ResponseEntity.ok(mensajesConUsuario);
